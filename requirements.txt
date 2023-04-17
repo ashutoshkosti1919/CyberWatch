@@ -1,0 +1,8 @@
+channels
+channels_redis
+numpy
+requests
+Django
+pandas
+asgiref
+scikit_learn
