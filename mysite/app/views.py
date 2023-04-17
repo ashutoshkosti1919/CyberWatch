@@ -11,9 +11,9 @@ from channels import layers
 
 from django.shortcuts import render
 from django.http import HttpResponse
-from . import start_capture, stop_capture
-from .forms import RFIDForm
-from .models import RFID
+#from . import start_capture, stop_capture
+from app.forms import RFIDForm
+from app.models import RFID
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from scapy.all import *
