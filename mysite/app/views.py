@@ -23,7 +23,7 @@ def index(request):
 
 def capture_packet():
     channel_layer = get_channel_layer()
-    packets = pkts = sniff(iface='80-91-33-F2-26-49',  count=25, timeout=15)
+    packets = sniff(iface='80-91-33-F2-26-49',  count=25, timeout=15)
     for packet in packets:
         # Convert packet to JSON format
         json_packet = json.dumps(packet.summary())
