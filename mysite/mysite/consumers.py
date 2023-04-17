@@ -103,17 +103,15 @@ class ServiceStatus(AsyncHttpConsumer):
         return Status.objects.all()[0].status
 
 
-class RFIDConsumer(WebsocketConsumer):
-    def connect(self):
-        self.accept()
+class RFIDConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.channel_layer.group_add("rfid", self.channel_name)
+        await self.accept()
 
-    def disconnect(self, close_code):
-        pass
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard("rfid", self.channel_name)
 
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-
-        self.send(text_data=json.dumps({
-            'message': message
-        }))
+    async def rfid_start(self, event):
+        ip = event['data']['ip']
+        # Perform necessary actions here
+        # ...
