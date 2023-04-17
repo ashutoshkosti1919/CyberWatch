@@ -9,6 +9,45 @@ from app.models import Status, Alert
 from django.core.paginator import Paginator
 from channels import layers
 
+from django.shortcuts import render
+from django.http import HttpResponse
+from . import start_capture, stop_capture
+from .forms import RFIDForm
+from .models import RFID
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from scapy.all import *
+
+def index(request):
+    return render(request, 'index.html')
+
+def capture_packet():
+    channel_layer = get_channel_layer()
+    packets = sniff(filter="ip", count=10) # capture 10 packets with ip layer
+    for packet in packets:
+        # Convert packet to JSON format
+        json_packet = json.dumps(packet.summary())
+        # Send packet to websocket consumer
+        async_to_sync(channel_layer.group_send)("rfid", {"type": "rfid_start", "data": {"packet": json_packet}})
+
+def start_capture_view(request):
+    if request.method == 'POST':
+        form = RFIDForm(request.POST)
+        if form.is_valid():
+            ip_address = form.cleaned_data['ip_address']
+            RFID.objects.create(ip_address=ip_address)
+            # Call packet capturing function
+            capture_packet()
+            return HttpResponse("Capture Started")
+    else:
+        form = RFIDForm()
+    return render(request, 'start_capture.html', {'form': form})
+
+def stop_capture_view(request):
+    stop_capture()
+    return HttpResponse("Capture Stopped")
+
+
 def index(request):
     return render(
         request,
