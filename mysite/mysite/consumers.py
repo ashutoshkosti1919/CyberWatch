@@ -11,6 +11,7 @@ from django.core.serializers import serialize, deserialize
 from django.core.serializers.json import DjangoJSONEncoder
 from datetime import datetime, timedelta
 from urllib.parse import parse_qs
+from .sniffer import capture_packet
 
 class TestConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -113,5 +114,6 @@ class RFIDConsumer(AsyncWebsocketConsumer):
 
     async def rfid_start(self, event):
         ip = event['data']['ip']
+        capture_packet()
         # Perform necessary actions here
         # ...
