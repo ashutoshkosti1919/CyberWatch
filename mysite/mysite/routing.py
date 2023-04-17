@@ -10,7 +10,12 @@ from django.urls import re_path
 from . import consumers
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import path
-from app import consumers
+from app import consumers 
+from django.urls import path
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+from consumers import RFIDConsumer
+
 
 application = ProtocolTypeRouter({
     # Empty for now (http->django views is added by default)
@@ -33,5 +38,14 @@ application = ProtocolTypeRouter({
 
 
 websocket_urlpatterns = [
-    re_path(r'ws/api/$', consumers.RFIDConsumer.as_asgi()),
+    path('ws/rfid/', RFIDConsumer.as_asgi()),
 ]
+
+application = ProtocolTypeRouter({
+    'websocket': AuthMiddlewareStack(
+        URLRouter(
+            websocket_urlpatterns
+        )
+    ),
+})
+
